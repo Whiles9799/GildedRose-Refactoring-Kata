@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Policy;
 using NUnit.Framework;
 
@@ -8,6 +9,7 @@ namespace csharp
     {
         IList<Item> Items;
         private List<string> LegendaryItems;
+        private const string BackstagePass = "Backstage passes to a TAFKAL80ETC concert";
 
         public GildedRose(IList<Item> items)
         {
@@ -38,7 +40,7 @@ namespace csharp
 
         private int CalculateQualityChange(Item item)
         {
-            if (item.Name.Contains("Backstage passes"))
+            if (item.Name == BackstagePass)
             {
                 return CalculateBackstagePassQualityChange(item);
             }
@@ -70,7 +72,7 @@ namespace csharp
             //Quality drops to 0 after the concert
             if (item.SellIn <= 0)
             {
-                return item.Quality * -1;
+                return -item.Quality;
             }
             
             //Quality increases by 3 when there are 5 days o less 
@@ -86,12 +88,7 @@ namespace csharp
             }
 
             // increases in Quality as its SellIn value approaches
-            if (item.Quality < 50)
-            {
-                return 1;
-            }
-
-            return 0;
+            return 1;
         }
 
         private void VerifyLegendaryItem(Item item)
