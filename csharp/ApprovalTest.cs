@@ -11,6 +11,7 @@ namespace csharp
     [TestFixture]
     public class ApprovalTest
     {
+        /*
         [Test]
         public void ThirtyDays()
         {
@@ -24,5 +25,6 @@ namespace csharp
 
             Approvals.Verify(output);
         }
+        */
     }
 }

@@ -44,9 +44,9 @@ namespace csharp
             {
                 Console.WriteLine("-------- day " + i + " --------");
                 Console.WriteLine("name, sellIn, quality");
-                for (var j = 0; j < Items.Count; j++)
+                foreach (var item in Items)
                 {
-                    System.Console.WriteLine(Items[j]);
+                    Console.WriteLine(item);
                 }
                 Console.WriteLine("");
                 app.UpdateQuality();

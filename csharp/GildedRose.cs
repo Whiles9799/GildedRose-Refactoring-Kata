@@ -1,89 +1,112 @@
 ﻿using System.Collections.Generic;
+using System.Security.Policy;
+using NUnit.Framework;
 
 namespace csharp
 {
     public class GildedRose
     {
         IList<Item> Items;
-        public GildedRose(IList<Item> Items)
+        private List<string> LegendaryItems;
+
+        public GildedRose(IList<Item> items)
         {
-            this.Items = Items;
+            Items = items;
+            LegendaryItems = new List<string>
+            {
+                "Sulfuras, Hand of Ragnaros"
+            };
         }
 
         public void UpdateQuality()
         {
-            for (var i = 0; i < Items.Count; i++)
+            foreach (var item in Items)
             {
-                if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+                if (LegendaryItems.Contains(item.Name))
                 {
-                    if (Items[i].Quality > 0)
-                    {
-                        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                        {
-                            Items[i].Quality = Items[i].Quality - 1;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].SellIn < 11)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-
-                            if (Items[i].SellIn < 6)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-                        }
-                    }
+                    VerifyLegendaryItem(item);
+                    break;
                 }
 
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                {
-                    Items[i].SellIn = Items[i].SellIn - 1;
-                }
-
-                if (Items[i].SellIn < 0)
-                {
-                    if (Items[i].Name != "Aged Brie")
-                    {
-                        if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].Quality > 0)
-                            {
-                                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                                {
-                                    Items[i].Quality = Items[i].Quality - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                        }
-                    }
-                    else
-                    {
-                        if (Items[i].Quality < 50)
-                        {
-                            Items[i].Quality = Items[i].Quality + 1;
-                        }
-                    }
-                }
+                var qualityChange = CalculateQualityChange(item);
+                item.SellIn--;
+                item.Quality += qualityChange;
+                item.Quality = QualityOverflowHandler(item);
             }
+        }
+
+        private int CalculateQualityChange(Item item)
+        {
+            if (item.Name.Contains("Backstage passes"))
+            {
+                return CalculateBackstagePassQualityChange(item);
+            }
+
+            var qualityChange = -1;
+            if (item.Name.Contains("Conjured"))
+            {
+                qualityChange *= 2;
+            }
+
+            if (item.SellIn <= 0)
+            {
+                qualityChange *= 2;
+            }
+
+            if (item.Name == "Aged Brie")
+            {
+                qualityChange *= -1;
+            }
+
+            return qualityChange;
+        }
+
+        private int CalculateBackstagePassQualityChange(Item item)
+        {
+            if (item.SellIn <= 0)
+            {
+                return item.Quality * -1;
+            }
+
+            if (item.SellIn <= 5 && item.Quality < 50)
+            {
+                return 3;
+            }
+
+            if (item.SellIn <= 10 && item.Quality < 50)
+            {
+                return 2;
+            }
+
+            if (item.Quality < 50)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        private void VerifyLegendaryItem(Item item)
+        {
+            if (item.SellIn != 0)
+            {
+                item.SellIn = 0;
+            }
+        }
+
+        private int QualityOverflowHandler(Item item)
+        {
+            if (item.Quality < 0)
+            {
+                return 0;
+            }
+
+            if (item.Quality > 50)
+            {
+                return 50;
+            }
+
+            return item.Quality;
         }
     }
 }
