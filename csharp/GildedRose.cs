@@ -85,7 +85,7 @@ namespace csharp
                 return 2;
             }
 
-            // increases in Quality as its SellIn value approaches;
+            // increases in Quality as its SellIn value approaches
             if (item.Quality < 50)
             {
                 return 1;
